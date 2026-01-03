@@ -13,13 +13,15 @@ class Appservice {
     try {
       String webUrl = "http://localhost:3000/about/add";
       String emulatorurl = "http://10.0.2.2:3000/about/add";
-      final url = Uri.parse(emulatorurl);
+      String renderUrl = "https://new-app-qa04.onrender.com/about/add";
+      final url = Uri.parse(renderUrl);
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"name": name, "age": age, "city": city}),
       );
-      if (response.statusCode == 200) {
+      debugPrint("your status code is : ${response.statusCode.toString()}");
+      if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint("Data added successfully");
         debugPrint(response.body);
       } else {

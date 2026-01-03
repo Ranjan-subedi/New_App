@@ -1,14 +1,17 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+
+app.use(express.urlencoded({extended:true}));
+app.use(express.json());
+
 const new_router = require("./Routers/route.js");
 const DataModel = require("./module/db_schema.js");
 
 app.use(cors());
 
 const mongoose = require("mongoose");
-app.use(express.urlencoded({extended:true}));
-app.use(express.json());
+
 
 const mongooseUrl = "mongodb+srv://kaskeliranjan_db_user:Ranjan123@newapp.xkyffgl.mongodb.net/?appName=NewApp";
 

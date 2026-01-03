@@ -29,6 +29,17 @@ app.get("/help",(req,res)=>{
     res.send("This is the help section of the website");
 });
 
+
+app.get("/list", async (req, res) => {
+  try {
+    const dataList = await DataModel.find({});
+    res.status(200).json(dataList);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 app.use("/about",new_router);
 
 

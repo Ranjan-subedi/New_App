@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:new_app/appService.dart';
+import 'package:new_app/module.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {
@@ -35,6 +36,9 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            SingleChildScrollView(
+              child: ,
+            ),
             SizedBox(height: 20),
             TextField(
               controller: nameController,
@@ -60,19 +64,24 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton(
               onPressed: () async {
                 final uuid = Uuid();
-                await appservice.addData(
-                  id: uuid.v1().toString(),
-                  name: nameController.text,
-                  age: ageController.text,
-                  city: cityController.text,
-                );
+
+                final newData = NewModel(
+                    id: uuid.v1(),
+                    name: nameController.text,
+                    age: ageController.text,
+                    city: cityController.text);
+
+                await appservice.createData(newData);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text("Data added successfully")),
                 );
+
               },
               child: Icon(Icons.add),
             ),
-            ElevatedButton(onPressed: () {}, child: Icon(Icons.delete)),
+            ElevatedButton(onPressed: () {
+
+            }, child: Icon(Icons.delete)),
             ElevatedButton(
               onPressed: () {},
               child: Icon(Icons.read_more_outlined),

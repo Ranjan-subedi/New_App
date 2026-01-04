@@ -22,11 +22,29 @@ mongoose.connect(mongooseUrl).then(()=>{
     
 app.get("/",(req,res)=>{
     res.send("Hello World from express server");
-    console.log("Hello world from server");
+    console.log("Hello world from server done");
 });
 
 app.get("/help",(req,res)=>{
     res.send("This is the help section of the website");
+});
+
+
+app.post("/delete",async (req, res)=>{
+  try{
+    await DataModel.deleteOne({id : req.body.id});
+
+    if(deletedcount === 0){
+      return res.status(404).json({message: "Data not found" });
+    }else{
+
+    const response = {message: "Data deleted successfully of Id ==> "+ `${req.body.id}`,
+    }
+    };
+    res.status(200).json(response);
+  }catch(err){
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:new_app/appService.dart';
+import 'package:new_app/app_service.dart';
 import 'package:new_app/module.dart';
 import 'package:uuid/uuid.dart';
 
@@ -24,10 +24,27 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final Appservice appservice = Appservice();
+  final AppService appservice = AppService();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
+
+  late Future<List<NewModel>> futureData;
+
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    futureData=appservice.fetchData();
+  }
+
+  void refreshData(){
+    setState(() {
+      futureData  = appservice.fetchData();
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +54,36 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SingleChildScrollView(
-              child: ,
+              child: Container(
+                height: 400,
+                child: FutureBuilder<List<NewModel>>(
+                  future: futureData ,
+                  builder: (context, snapshot) {
+                  if(snapshot.connectionState == ConnectionState.waiting){
+                    return CircularProgressIndicator();
+                  }else if (snapshot.hasError){
+                    return Text('Error : ${snapshot.hasError}');
+                  }else if(!snapshot.hasData || snapshot.data!.isEmpty){
+                    return Text('No Data Found');
+                  }else{
+                    final personList = snapshot.data!;
+                    return ListView.builder(
+                      // physics: NeverScrollableScrollPhysics(),
+                      itemCount: personList.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final person = personList[index];
+                      return  Card(
+                        child: ListTile(
+                          trailing: dlt(person.id!),
+                          title: Text(person.name ?? ""),
+                          subtitle: Text("Age : ${person.age} , City : ${person.city}"),
+                        ),
+                      );
+                    },);
+                  }
+                },),
+              ),
             ),
             SizedBox(height: 20),
             TextField(
@@ -75,6 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text("Data added successfully")),
                 );
+                refreshData();
 
               },
               child: Icon(Icons.add),
@@ -83,7 +130,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
             }, child: Icon(Icons.delete)),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                refreshData();
+              },
               child: Icon(Icons.read_more_outlined),
             ),
             ElevatedButton(onPressed: () {}, child: Icon(Icons.update)),
@@ -92,4 +141,17 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+  Widget dlt (String id){
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(onPressed: () async{
+          await appservice.delete(id);
+        }, icon: Icon(Icons.delete)),
+
+        IconButton(onPressed: () {
+        }, icon: Icon(Icons.update)),
+  ],
+      );
+}
 }

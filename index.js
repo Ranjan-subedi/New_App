@@ -30,6 +30,32 @@ app.get("/help",(req,res)=>{
 });
 
 
+app.put("/update",async(req,res)=>{
+  try {
+    const updateData = await DataModel.findOneAndUpdate(
+      {id: req.body.id},{
+        name: req.body.name,
+        age: req.body.age,
+        city: req.body.city
+      },
+      {new: true, runValidators: true}
+    );
+
+    if (!updateData) {
+      return res.status(404).json({message: "Data not found" });
+    }
+
+    res.status(200).json({
+      message: "Data updated successfully",
+      data: updateData
+    });
+
+  } catch (error) {
+    res.status(500).json({message: "Error updating data", error: error.message});
+  }
+});
+
+
 app.post("/delete",async (req, res)=>{
   try{
     await DataModel.deleteOne({id : req.body.id});

@@ -58,9 +58,9 @@ app.put("/update",async(req,res)=>{
 
 app.post("/delete",async (req, res)=>{
   try{
-    await DataModel.deleteOne({id : req.body.id});
+    const result = await DataModel.deleteOne({id : req.body.id});
 
-    if(deletedcount === 0){
+    if(result.deletedCount === 0){
       return res.status(404).json({message: "Data not found" });
     }else{
 

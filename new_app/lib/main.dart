@@ -38,6 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: implement initState
     super.initState();
     futureData=appservice.fetchData();
+    refreshData();
   }
 
   void refreshData(){
@@ -49,94 +50,99 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SingleChildScrollView(
-              child: Container(
-                height: 400,
-                child: FutureBuilder<List<NewModel>>(
-                  future: futureData ,
-                  builder: (context, snapshot) {
-                  if(snapshot.connectionState == ConnectionState.waiting){
-                    return CircularProgressIndicator();
-                  }else if (snapshot.hasError){
-                    return Text('Error : ${snapshot.hasError}');
-                  }else if(!snapshot.hasData || snapshot.data!.isEmpty){
-                    return Text('No Data Found');
-                  }else{
-                    final personList = snapshot.data!;
-                    return ListView.builder(
-                      // physics: NeverScrollableScrollPhysics(),
-                      itemCount: personList.length,
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        final person = personList[index];
-                      return  Card(
-                        child: ListTile(
-                          trailing: dlt(person.id!),
-                          title: Text(person.name ?? ""),
-                          subtitle: Text("Age : ${person.age} , City : ${person.city}"),
-                        ),
-                      );
-                    },);
-                  }
-                },),
+      body: RefreshIndicator(
+        onRefresh: () async{
+          await refreshData ;
+        },
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SingleChildScrollView(
+                child: Container(
+                  height: 400,
+                  child: FutureBuilder<List<NewModel>>(
+                    future: futureData ,
+                    builder: (context, snapshot) {
+                    if(snapshot.connectionState == ConnectionState.waiting){
+                      return CircularProgressIndicator();
+                    }else if (snapshot.hasError){
+                      return Text('Error : ${snapshot.hasError}');
+                    }else if(!snapshot.hasData || snapshot.data!.isEmpty){
+                      return Text('No Data Found');
+                    }else{
+                      final personList = snapshot.data!;
+                      return ListView.builder(
+                        // physics: NeverScrollableScrollPhysics(),
+                        itemCount: personList.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          final person = personList[index];
+                        return  Card(
+                          child: ListTile(
+                            trailing: dlt(person.id!),
+                            title: Text(person.name ?? ""),
+                            subtitle: Text("Age : ${person.age} , City : ${person.city}"),
+                          ),
+                        );
+                      },);
+                    }
+                  },),
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: "Name",
+              SizedBox(height: 20),
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "Name",
+                ),
               ),
-            ),
-            TextField(
-              controller: ageController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: "age",
+              TextField(
+                controller: ageController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "age",
+                ),
               ),
-            ),
-            TextField(
-              controller: cityController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: "city",
+              TextField(
+                controller: cityController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "city",
+                ),
               ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final uuid = Uuid();
+              ElevatedButton(
+                onPressed: () async {
+                  final uuid = Uuid();
 
-                final newData = NewModel(
-                    id: uuid.v1(),
-                    name: nameController.text,
-                    age: ageController.text,
-                    city: cityController.text);
+                  final newData = NewModel(
+                      id: uuid.v1(),
+                      name: nameController.text,
+                      age: ageController.text,
+                      city: cityController.text);
 
-                await appservice.createData(newData);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Data added successfully")),
-                );
-                refreshData();
+                  await appservice.createData(newData);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Data added successfully")),
+                  );
+                  refreshData();
 
-              },
-              child: Icon(Icons.add),
-            ),
-            ElevatedButton(onPressed: () {
+                },
+                child: Icon(Icons.add),
+              ),
+              ElevatedButton(onPressed: () {
 
-            }, child: Icon(Icons.delete)),
-            ElevatedButton(
-              onPressed: () {
-                refreshData();
-              },
-              child: Icon(Icons.read_more_outlined),
-            ),
-            ElevatedButton(onPressed: () {}, child: Icon(Icons.update)),
-          ],
+              }, child: Icon(Icons.delete)),
+              ElevatedButton(
+                onPressed: () {
+                  refreshData();
+                },
+                child: Icon(Icons.read_more_outlined),
+              ),
+              ElevatedButton(onPressed: () {}, child: Icon(Icons.update)),
+            ],
+          ),
         ),
       ),
     );
@@ -147,6 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
       children: [
         IconButton(onPressed: () async{
           await appservice.delete(id);
+          refreshData();
         }, icon: Icon(Icons.delete)),
 
         IconButton(onPressed: () {

@@ -59,9 +59,10 @@ class AppService {
 // With Model Of Data fromJson and toJson
   Future<void> createData(NewModel data)async{
     try{
-      final resData = await http.get(Uri.parse("$renderUrl/about/add"));
+      final resData = await http.get(Uri.parse("$renderUrl/list"));
       debugPrint(resData.body);
-      final url = Uri.parse(renderUrl);
+
+      final url = Uri.parse("$renderUrl/about/add");
       final response =await http.post(url,
       headers: {"Content-Type" :"application/json" },
         body: jsonEncode(data.toJson())

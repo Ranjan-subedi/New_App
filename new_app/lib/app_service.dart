@@ -9,6 +9,38 @@ class AppService {
 
   String renderUrl = "https://new-app-qa04.onrender.com";
 
+  Future update({
+    required String id,
+    required String name,
+    required String age,
+    required String city,
+})async{
+    try{
+      final url = Uri.parse("$renderUrl/update");
+      final response = await http.put(
+        url,
+        headers: {"Content-Type": "application/json"} ,
+        body:jsonEncode({
+          "id" : id,
+          "name" : name,
+          "age" : age,
+          "city" : city,
+        })
+      );
+
+      if(response.statusCode == 200 || response.statusCode == 20){
+        debugPrint("Data Updated successfully");
+        debugPrint(response.body);
+      }else{
+        debugPrint("Failed to update data");
+      }
+
+
+    }catch(e){
+      debugPrint(e.toString());
+    }
+  }
+
   Future<void> delete(String id)async{
     try{
       final url = Uri.parse("$renderUrl/delete");

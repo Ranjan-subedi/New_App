@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:new_app/pages/addpage.dart';
+import 'package:new_app/pages/update.dart';
 import 'package:uuid/uuid.dart';
 
 import '../app_service.dart';
@@ -46,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: RefreshIndicator(
         onRefresh: ()async{
-          refreshData;
+          refreshData();
         },
         child: Center(
           child: Column(
@@ -77,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             return  Card(
                               elevation: 5,
                               child: ListTile(
-                                trailing: dlt(person.id!),
+                                trailing: dlt(person),
                                 title: Text(person.name ?? ""),
                                 subtitle: Text("Age : ${person.age} , City : ${person.city}"),
                               ),
@@ -180,16 +181,23 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-  Widget dlt (String id){
+  Widget dlt (NewModel person){
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(onPressed: () async{
-          await appservice.delete(id);
+          await appservice.delete(person.id!);
           refreshData();
         }, icon: Icon(Icons.delete, color:Color(0xFF9248E8), size: 28,)),
 
-        IconButton(onPressed: () {
+        IconButton(onPressed: () async{
+          final result = await Navigator.push(context, MaterialPageRoute(builder:
+              (context) =>
+                  UpdateDataPage(person: person,),),);
+
+          if(result == true){
+            refreshData();
+          }
         }, icon: Icon(Icons.update, color: Color(0xFF9248E8),size: 28,)),
       ],
     );

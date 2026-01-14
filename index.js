@@ -12,8 +12,11 @@ app.use(cors());
 
 const mongoose = require("mongoose");
 
+const dotenv = require("dotenv");
+dotenv.config();
 
-const mongooseUrl = "mongodb+srv://kaskeliranjan_db_user:Ranjan123@newapp.xkyffgl.mongodb.net/?appName=NewApp";
+
+const mongooseUrl = process.env.MONGOOSE_DATABASE;
 
 mongoose.connect(mongooseUrl).then(()=>{
 
@@ -48,7 +51,7 @@ app.put("/update",async(req,res)=>{
     res.status(200).json({
       message: "Data updated successfully",
       data: updateData
-    });
+    }); 
 
   } catch (error) {
     res.status(500).json({message: "Error updating data", error: error.message});
